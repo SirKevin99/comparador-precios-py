@@ -1,15 +1,19 @@
 import { Search } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import ProductCard from '../components/ProductCard'
 import { useSearchProducts } from '../hooks/useProducts'
 import { useTheme } from '../hooks/useTheme'
+import { useAuthStore } from '../store/authStore'
 import ThemeToggle from '../components/ThemeToggle'
 
 const SKELETONS = Array.from({ length: 3 }, (_, idx) => idx)
 
 function SearchPage() {
   const { isDark } = useTheme()
+  const navigate = useNavigate()
+  const user = useAuthStore((state) => state.user)
   const [searchInput, setSearchInput] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -41,6 +45,22 @@ function SearchPage() {
       <ThemeToggle />
       <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
         <header className="mb-8 rounded-xl bg-transparent text-center dark:bg-gray-900">
+          <div className="mb-4 flex justify-end">
+            <div className="flex items-center gap-2">
+              {user ? (
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">
+                  {user.email.charAt(0).toUpperCase()}
+                </span>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => navigate(user ? '/profile' : '/login')}
+                className="rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-800 dark:hover:bg-blue-500"
+              >
+                {user ? 'Mi perfil' : 'Iniciar sesión'}
+              </button>
+            </div>
+          </div>
           <h1 className="text-4xl font-extrabold text-blue-900 md:text-5xl dark:text-blue-400">PrecionPY</h1>
           <p className="mt-2 text-base text-slate-600 md:text-lg dark:text-gray-400">Compará precios en Paraguay</p>
         </header>

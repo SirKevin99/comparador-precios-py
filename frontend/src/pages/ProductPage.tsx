@@ -14,8 +14,10 @@ import {
   YAxis,
 } from 'recharts'
 
+import { api } from '../lib/api'
 import { useProduct } from '../hooks/useProduct'
 import { useTheme } from '../hooks/useTheme'
+import { useAuthStore } from '../store/authStore'
 
 type AlertCondition = 'below' | 'above' | 'any'
 
@@ -25,10 +27,12 @@ function ProductPage() {
   const navigate = useNavigate()
   const { id } = useParams()
   const { isDark } = useTheme()
+  const user = useAuthStore((state) => state.user)
   const { data, isLoading, isError } = useProduct(id)
 
   const [targetPrice, setTargetPrice] = useState('')
   const [condition, setCondition] = useState<AlertCondition>('below')
+  const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   const history = useMemo(() => {
     if (!data?.price_history) return []
@@ -95,6 +99,36 @@ function ProductPage() {
   const lastUpdatedText = data.last_checked_at
     ? formatDistanceToNow(new Date(data.last_checked_at), { locale: es, addSuffix: true })
     : 'sin fecha'
+
+  const handleCreateAlert = async () => {
+    setAlertMessage(null)
+
+    if (!user) {
+      navigate('/login')
+      return
+    }
+
+    try {
+      const parsedTargetPrice = targetPrice.trim() === '' ? null : Number(targetPrice)
+      if (condition !== 'any' && (parsedTargetPrice === null || Number.isNaN(parsedTargetPrice))) {
+        setAlertMessage({ type: 'error', text: 'Ingresá un precio objetivo válido para esa condición.' })
+        return
+      }
+
+      await api.post('/alerts', {
+        user_id: user.id,
+        product_id: id,
+        target_price: condition === 'any' ? null : parsedTargetPrice,
+        condition,
+      })
+
+      setAlertMessage({ type: 'success', text: '¡Alerta creada! Te avisamos cuando el precio cambie' })
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'No se pudo crear la alerta. Intentá nuevamente.'
+      setAlertMessage({ type: 'error', text: message })
+    }
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-6 dark:bg-gray-900 md:px-6">
@@ -171,11 +205,16 @@ function ProductPage() {
                 </select>
                 <button
                   type="button"
-                  onClick={() => window.alert('Próximamente: necesitás iniciar sesión')}
+                  onClick={() => void handleCreateAlert()}
                   className="w-full rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-800 dark:hover:bg-blue-500"
                 >
                   Crear alerta
                 </button>
+                {alertMessage ? (
+                  <p className={`text-sm ${alertMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                    {alertMessage.text}
+                  </p>
+                ) : null}
               </div>
             </section>
           </div>

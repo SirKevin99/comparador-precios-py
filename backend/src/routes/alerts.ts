@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body, param } from "express-validator";
 
-import { createOrUpdateAlert, getAlertsByUser } from "../controllers/alerts.controller";
+import { createOrUpdateAlert, getAlertsByUser, updateAlert } from "../controllers/alerts.controller";
 
 const router = Router();
 
@@ -20,5 +20,6 @@ router.post(
 );
 
 router.get("/:userId", [param("userId").notEmpty().withMessage("userId is required")], getAlertsByUser);
+router.patch("/:id", [param("id").notEmpty().withMessage("id is required")], updateAlert);
 
 export default router;

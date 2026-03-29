@@ -21,6 +21,12 @@ export interface UpsertAlertInput {
   condition: AlertCondition;
 }
 
+export interface UpdateAlertInput {
+  is_active?: boolean;
+  target_price?: number | null;
+  condition?: AlertCondition;
+}
+
 class AlertsService {
   async upsertAlert(input: UpsertAlertInput): Promise<Alert> {
     const payload = {
@@ -56,6 +62,33 @@ class AlertsService {
     }
 
     return (data ?? []) as Alert[];
+  }
+
+  async updateAlert(id: string, updateData: UpdateAlertInput): Promise<Alert> {
+    const payload: Record<string, unknown> = {};
+
+    if (typeof updateData.is_active === "boolean") {
+      payload.is_active = updateData.is_active;
+    }
+    if (Object.prototype.hasOwnProperty.call(updateData, "target_price")) {
+      payload.target_price = updateData.target_price ?? null;
+    }
+    if (updateData.condition) {
+      payload.condition = updateData.condition;
+    }
+
+    const { data, error } = await supabase
+      .from("alerts")
+      .update(payload)
+      .eq("id", id)
+      .select("*, products (*)")
+      .single();
+
+    if (error) {
+      throw new Error(`Supabase updateAlert error: ${error.message}`);
+    }
+
+    return data as Alert;
   }
 }
 
