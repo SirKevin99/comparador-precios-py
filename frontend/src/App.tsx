@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import { useTheme } from './hooks/useTheme'
+import ProductPage from './pages/ProductPage'
 import SearchPage from './pages/SearchPage'
 
 const queryClient = new QueryClient({
@@ -20,7 +21,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<SearchPage />} />
-          <Route path="/product/:id" element={<div>Detalle próximamente</div>} />
+          <Route path="/product/:id" element={<ProductPage />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
