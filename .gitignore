@@ -1,0 +1,13 @@
+# Variables de entorno — NUNCA subir al repo
+.env
+.env.local
+.env.production
+
+# Node
+node_modules/
+dist/
+build/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
