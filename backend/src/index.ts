@@ -15,13 +15,16 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://comparador-precios-py.vercel.app",
   process.env.FRONTEND_URL || ""
-].filter(Boolean);
+];
 
 app.use(helmet());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) return callback(null, true);
+      const isVercel = origin.endsWith(".vercel.app");
+      const isAllowed = allowedOrigins.includes(origin);
+      if (isVercel || isAllowed) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
