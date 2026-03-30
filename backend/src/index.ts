@@ -15,22 +15,23 @@ const PORT = process.env.PORT || 3001;
 const allowedOrigins = [
   "http://localhost:5173",
   "https://comparador-precios-py.vercel.app",
-  "http://localhost:3001" // para pruebas locales con Postman u otras herramientas
+  process.env.FRONTEND_URL || ""
 ];
 
-// Middleware CORS
+app.use(helmet());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // solicitudes sin origin (Postman)
-      
-      // Permitir cualquier subdominio de Vercel + allowedOrigins
-      const isAllowed = allowedOrigins.includes(origin) || origin.endsWith(".vercel.app");
-      if (isAllowed) return callback(null, true);
-
-      callback(new Error(`CORS error: origin ${origin} not allowed`));
+      if (!origin) return callback(null, true);
+      const isVercel = origin.endsWith(".vercel.app");
+      const isAllowed = allowedOrigins.includes(origin);
+      if (isVercel || isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
     },
-    credentials: true, // permite cookies
+    credentials: true
   })
 );
 
