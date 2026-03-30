@@ -13,20 +13,18 @@ const PORT = process.env.PORT || 3001;
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://comparador-precios-py.vercel.app"
+  "https://comparador-precios-py.vercel.app",
+  "https://comparador-precios-fpecrp6qi-sirkevin99s-projects.vercel.app" 
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // permitir solicitudes sin origin (Postman, tests, etc.)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS error: origin ${origin} not allowed`));
+      if (!origin) return callback(null, true); // permitir sin origin
+      if (origin.endsWith(".vercel.app")) {    // cualquier subdominio de Vercel
+        return callback(null, true);
       }
+      callback(new Error(`CORS error: origin ${origin} not allowed`));
     },
     credentials: true
   })
