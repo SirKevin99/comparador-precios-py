@@ -9,7 +9,7 @@ import apiRoutes from "./routes";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 
 // Lista de orígenes permitidos explícitos (desarrollo y frontend principal)
 const allowedOrigins = [
