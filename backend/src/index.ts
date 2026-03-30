@@ -14,7 +14,8 @@ const PORT = process.env.PORT || 3001;
 // Lista de orígenes permitidos explícitos (desarrollo y frontend principal)
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://comparador-precios-py.vercel.app"
+  "https://comparador-precios-py.vercel.app",
+  "http://localhost:3001" // para pruebas locales con Postman u otras herramientas
 ];
 
 // Middleware CORS
